@@ -46,7 +46,7 @@ public enum Comparison {
 }
 
 public enum UpdateDescriptor<RemoteType> where RemoteType: CodingKeyed {
-    case string(RemoteType.Keys, to: StringRepresentable)
+    case string(RemoteType.Keys, to: ValueTypeRepresentable.StringRepresentable)
     case bool(RemoteType.Keys, to: BoolRepresentable)
     case double(RemoteType.Keys, to: DoubleRepresentable)
     case date(RemoteType.Keys, to: DateRepresentable)
@@ -75,7 +75,7 @@ public enum QueryDescriptor<RemoteType> where RemoteType: CodingKeyed {
     case urn(RemoteType.Keys, equals: URN)
     case bool(RemoteType.Keys, is: BoolRepresentable)
     case double(RemoteType.Keys, Comparison, DoubleRepresentable)
-    case string(RemoteType.Keys, Comparison, StringRepresentable)
+    case string(RemoteType.Keys, Comparison, ValueTypeRepresentable.StringRepresentable)
     case date(RemoteType.Keys, Comparison, DateRepresentable)
 
     public var internalValue: (String, Comparison, Any) {

@@ -4,6 +4,7 @@
 
 import CoreData
 import URN
+import ValueTypeRepresentable
 
 public class CoreDataWrapper {
 
@@ -100,6 +101,7 @@ public class CoreDataWrapper {
         to endDate: Date? = nil,
         oldestToNewest: Bool = true,
         key: CD.Keys? = nil,
+        query: [QueryDescriptor<CD>] = [],
         in context: Context = .view
     ) -> Result<[CD], Error> where CD: CoreDataManaged, CD: CodingKeyed {
         let endDate = endDate ?? Date()
@@ -110,13 +112,36 @@ public class CoreDataWrapper {
             key: key,
             sorting: oldestToNewest ? .ascending : .descending
         )
+        let dateQuery: [QueryDescriptor<CD>] = [
+            .date(key, .greaterEqualThan, startDate),
+            .date(key, .lessEqualThan, endDate)
+        ]
         return self.fetch(type)
             .query(
-                .date(key, .greaterEqualThan, startDate),
-                .date(key, .lessEqualThan, endDate)
+                dateQuery + query
             )
             .sort(sort)
             .fetch(in: .view)
+    }
+
+    public func fetch<CD>(
+        _ type: CD.Type,
+        from startDate: Date,
+        to endDate: Date? = nil,
+        oldestToNewest: Bool = true,
+        key: CD.Keys? = nil,
+        query: QueryDescriptor<CD>...,
+        in context: Context = .view
+    ) -> Result<[CD], Error> where CD: CoreDataManaged, CD: CodingKeyed {
+        fetch(
+            type,
+            from: startDate,
+            to: endDate,
+            oldestToNewest: oldestToNewest,
+            key: key,
+            query: query,
+            in: context
+        )
     }
 
     public func fetch<CD>(
@@ -124,6 +149,7 @@ public class CoreDataWrapper {
         to endDate: Date? = nil,
         oldestToNewest: Bool = true,
         key: CD.Keys? = nil,
+        query: [QueryDescriptor<CD>] = [],
         in context: Context = .view
     ) -> Result<[CD], Error> where CD: CoreDataManaged, CD: CodingKeyed {
         fetch(
@@ -132,6 +158,26 @@ public class CoreDataWrapper {
             to: endDate,
             oldestToNewest: oldestToNewest,
             key: key,
+            query: query,
+            in: context
+        )
+    }
+
+    public func fetch<CD>(
+        from startDate: Date,
+        to endDate: Date? = nil,
+        oldestToNewest: Bool = true,
+        key: CD.Keys? = nil,
+        query: QueryDescriptor<CD>...,
+        in context: Context = .view
+    ) -> Result<[CD], Error> where CD: CoreDataManaged, CD: CodingKeyed {
+        fetch(
+            CD.self,
+            from: startDate,
+            to: endDate,
+            oldestToNewest: oldestToNewest,
+            key: key,
+            query: query,
             in: context
         )
     }
