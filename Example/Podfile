@@ -1,0 +1,6 @@
+use_frameworks!
+target 'CoreDataWrapper_Tests' do
+  pod 'CoreDataWrapper', :path => '../'
+  
+  
+end

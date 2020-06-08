@@ -1,0 +1,16 @@
+PODS:
+  - CoreDataWrapper (0.1.0)
+
+DEPENDENCIES:
+  - CoreDataWrapper (from `../`)
+
+EXTERNAL SOURCES:
+  CoreDataWrapper:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CoreDataWrapper: 18b0bc2314817e93dbe7e447562fd5a53fbd1f59
+
+PODFILE CHECKSUM: bfacc65c9264d53c03e4938de4ddfe8092db5c3d
+
+COCOAPODS: 1.9.1

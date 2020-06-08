@@ -1,0 +1,6 @@
+framework module CoreDataWrapper {
+  umbrella header "CoreDataWrapper-umbrella.h"
+
+  export *
+  module * { export * }
+}
