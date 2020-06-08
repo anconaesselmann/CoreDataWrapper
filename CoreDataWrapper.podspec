@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CoreDataWrapper'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'A wrapper for core data'
   s.description      = <<-DESC
 A wrapper for core data.
@@ -14,5 +14,6 @@ A wrapper for core data.
   s.watchos.deployment_target = '3.0'
   s.source_files = 'CoreDataWrapper/Classes/**/*'
   s.frameworks = 'CoreData'
+  s.dependency 'ValueTypeRepresentable'
   s.dependency 'URN'
 end
