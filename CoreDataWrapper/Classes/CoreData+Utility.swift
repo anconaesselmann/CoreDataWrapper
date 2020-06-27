@@ -13,3 +13,7 @@ public protocol CoreDataManaged {
 public enum CoreDataError: Error {
     case unknownEntityName
 }
+
+public extension CoreDataManaged {
+    static var entityName: String { "\(Self.self)Entity" }
+}

@@ -67,6 +67,35 @@ public class CoreDataWrapper {
     }
 
     @discardableResult
+    public func insert<CD>(_ element: CD, orUpdate updates: [UpdateDescriptor<CD>], in context: Context) -> Result<Void, Error> where CD: CoreDataManaged, CD: UrnIdentifyable {
+        switch fetch(type(of: element), with: element.urn, in: context) {
+        case .success(let existing):
+            return update(existing, set: updates)
+        case .failure:
+            return insert(element, in: context)
+        }
+    }
+
+    @discardableResult
+    public func insert<CD>(_ element: CD, where selectors: [QueryDescriptor<CD>], orUpdate updates: [UpdateDescriptor<CD>], in context: Context) -> Result<Void, Error> where CD: CoreDataManaged {
+        switch fetch(type(of: element))
+            .query(selectors)
+            .limitOne()
+            .fetch(in: context)
+        {
+        case .success(let existing):
+            return update(existing, where: selectors, set: updates)
+        case .failure:
+            return insert(element, in: context)
+        }
+    }
+
+//    @discardableResult
+//    public func insert<CD>(_ element: CD, orUpdate updates: UpdateDescriptor<CD>..., in context: Context) -> Result<Void, Error> where CD: CoreDataManaged, CD: UrnIdentifyable {
+//        return insert(element, orUpdate: updates, in: context)
+//    }
+
+    @discardableResult
     public func insertUnique<CD>(_ element: CD, urnKey: CD.Keys? = nil, in context: Context = .background) -> Result<Void, Error> where CD: CoreDataManaged, CD: UrnIdentifyable {
         guard let key = urnKey ?? CD.Keys(stringValue: UrnKeys.urn.stringValue) else {
             return .failure(E.keyDoesNotExist)
@@ -204,7 +233,12 @@ public class CoreDataWrapper {
     }
 
     @discardableResult
-    public func update<CD>(_ element: CD, to updates: UpdateDescriptor<CD>..., in context: Context = .background) -> Result<Void, Error> where CD: CoreDataManaged, CD: UrnIdentifyable {
+    public func update<CD>(_ element: CD, set updates: UpdateDescriptor<CD>..., in context: Context = .background) -> Result<Void, Error> where CD: CoreDataManaged, CD: UrnIdentifyable {
+        update(element, set: updates, in: context)
+    }
+
+    @discardableResult
+    public func update<CD>(_ element: CD, set updates: [UpdateDescriptor<CD>], in context: Context = .background) -> Result<Void, Error> where CD: CoreDataManaged, CD: UrnIdentifyable {
         guard let key = CD.Keys(stringValue: UrnKeys.urn.stringValue) else {
             return .failure(E.keyDoesNotExist)
         }
@@ -213,6 +247,29 @@ public class CoreDataWrapper {
             .limitOne()
             .update(updates, in: context)
     }
+
+    // TODO: element not used
+    @discardableResult
+    public func update<CD>(_ element: CD, where selectors: [QueryDescriptor<CD>], set updates: [UpdateDescriptor<CD>], in context: Context = .background) -> Result<Void, Error> where CD: CoreDataManaged /*, CD: UrnIdentifyable*/ {
+//        guard let urnKey = CD.Keys(stringValue: UrnKeys.urn.stringValue) else {
+//            return .failure(E.keyDoesNotExist)
+//        }
+        return self.fetch(CD.self)
+            .query(selectors) // .query([.urn(urnKey, equals: element.urn)] + selectors)
+            .limitOne()
+            .update(updates, in: context)
+    }
+
+    @discardableResult
+    public func delete<CD>(type: CD.Type, where urn: URN, in context: Context = .background) -> Result<Void, Error> where CD: CoreDataManaged, CD: UrnIdentifyable {
+        guard let urnKey = CD.Keys(stringValue: UrnKeys.urn.stringValue) else {
+            return .failure(E.keyDoesNotExist)
+        }
+        return self.fetch(CD.self)
+            .query(.urn(urnKey, equals: urn))
+            .delete(in: context)
+    }
+
 
     public struct FetchRequestWrapper<CD> where CD: CoreDataManaged, CD: CodingKeyed {
         private let fetchRequest: NSFetchRequest<NSManagedObject>
@@ -334,8 +391,12 @@ public class CoreDataWrapper {
                         return .failure(E.elementNotFound)
                     }
                     for update in updates {
-                        let (key, value) = update.internalValue
-                        managed.setValue(value, forKey: key)
+                        let (key, maybeValue) = update.internalValue
+                        if let value = maybeValue {
+                            managed.setValue(value, forKey: key)
+                        } else {
+                            managed.setNilValueForKey(key)
+                        }
                     }
                     try managedContext.save()
                     return .success(())
@@ -358,6 +419,19 @@ public class CoreDataWrapper {
             switch limitOne().fetch(in: context) {
             case .success: return true
             case .failure: return false
+            }
+        }
+
+        public func delete(in context: Context) -> Result<Void, Error> {
+            let context = container.nsManagedContext(for: context)
+            do {
+                for managed in try context.fetch(fetchRequest) {
+                    context.delete(managed)
+                }
+                try context.save()
+                return .success(())
+            } catch {
+                return .failure(error)
             }
         }
     }

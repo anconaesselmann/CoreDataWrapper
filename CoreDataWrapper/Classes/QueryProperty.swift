@@ -46,27 +46,27 @@ public enum Comparison {
 }
 
 public enum UpdateDescriptor<RemoteType> where RemoteType: CodingKeyed {
-    case string(RemoteType.Keys, to: ValueTypeRepresentable.StringRepresentable)
-    case bool(RemoteType.Keys, to: BoolRepresentable)
-    case double(RemoteType.Keys, to: DoubleRepresentable)
-    case date(RemoteType.Keys, to: DateRepresentable)
-    case int(RemoteType.Keys, to: IntRepresentable)
-    case int16(RemoteType.Keys, to: Int16Representable)
+    case string(RemoteType.Keys, to: ValueTypeRepresentable.StringRepresentable?)
+    case bool(RemoteType.Keys, to: BoolRepresentable?)
+    case double(RemoteType.Keys, to: DoubleRepresentable?)
+    case date(RemoteType.Keys, to: DateRepresentable?)
+    case int(RemoteType.Keys, to: IntRepresentable?)
+    case int16(RemoteType.Keys, to: Int16Representable?)
 
-    public var internalValue: (String, Any) {
+    public var internalValue: (String, Any?) {
         switch self {
         case .string(let key, to: let stringRepresentable):
-            return (key.stringValue, stringRepresentable.stringValue)
+            return (key.stringValue, stringRepresentable?.stringValue)
         case .double(let key, to: let doubleRepresentable):
-            return (key.stringValue, doubleRepresentable.doubleValue)
+            return (key.stringValue, doubleRepresentable?.doubleValue)
         case .bool(let key, to: let boolRepresentable):
-            return (key.stringValue, boolRepresentable.boolValue)
+            return (key.stringValue, boolRepresentable?.boolValue)
         case .date(let key, to: let dateRepresentable):
-            return (key.stringValue, dateRepresentable.dateValue)
+            return (key.stringValue, dateRepresentable?.dateValue)
         case .int(let key, to: let intRepresentable):
-            return (key.stringValue, intRepresentable.intValue)
+            return (key.stringValue, intRepresentable?.intValue)
         case .int16(let key, to: let intRepresentable):
-            return (key.stringValue, intRepresentable.int16Value)
+            return (key.stringValue, intRepresentable?.int16Value)
         }
     }
 }

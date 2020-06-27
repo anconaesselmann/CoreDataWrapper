@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'CoreDataWrapper'
-  s.version          = '0.1.2'
+  s.version          = '0.1.3'
   s.summary          = 'A wrapper for core data'
   s.description      = <<-DESC
 A wrapper for core data.
