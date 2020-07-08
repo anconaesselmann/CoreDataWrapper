@@ -73,6 +73,7 @@ public enum UpdateDescriptor<RemoteType> where RemoteType: CodingKeyed {
 
 public enum QueryDescriptor<RemoteType> where RemoteType: CodingKeyed {
     case urn(RemoteType.Keys, equals: URN)
+    case uuid(RemoteType.Keys, equals: UUID)
     case bool(RemoteType.Keys, is: BoolRepresentable)
     case double(RemoteType.Keys, Comparison, DoubleRepresentable)
     case string(RemoteType.Keys, Comparison, ValueTypeRepresentable.StringRepresentable)
@@ -90,6 +91,8 @@ public enum QueryDescriptor<RemoteType> where RemoteType: CodingKeyed {
             return (key.stringValue, .equals, isTrue.boolValue)
         case .urn(let key, equals: let urn):
             return (key.stringValue, .equals, urn.stringValue)
+        case .uuid(let key, equals: let uuid):
+            return (key.stringValue, .equals, uuid.uuidValue)
         }
     }
 }

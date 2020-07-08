@@ -109,6 +109,17 @@ public class CoreDataWrapper {
         return insert(element, in: context)
     }
 
+    @discardableResult
+    public func insertUnique<CD>(_ element: CD, in context: Context = .background, where query: QueryDescriptor<CD>...) -> Result<Void, Error> where CD: CoreDataManaged {
+        guard !fetch(type(of: element))
+            .query(query)
+            .exists(in: context)
+        else {
+            return .failure(E.elementAlreadyExists)
+        }
+        return insert(element, in: context)
+    }
+
     public func fetch<CD>(
         _ type: CD.Type,
         with urn: URN,
@@ -290,6 +301,9 @@ public class CoreDataWrapper {
                 case .urn(let key, equals: let urn):
                     let stringOperator = Comparison.equals.stringOperator
                     return NSPredicate(format: "\(key.stringValue) \(stringOperator) %@", urn.stringValue)
+                case .uuid(let key, equals: let uuid):
+                    let stringOperator = Comparison.equals.stringOperator
+                    return NSPredicate(format: "\(key.stringValue) \(stringOperator) %@", uuid as CVarArg)
                 case .string(let key, let comparison, let stringRepresentable):
                     let stringOperator = comparison.stringOperator
                     return NSPredicate(format: "\(key.stringValue) \(stringOperator) %@", stringRepresentable.stringValue)

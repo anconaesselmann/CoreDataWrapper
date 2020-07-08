@@ -12,9 +12,19 @@ public struct CodingKeyedManagedObjectWrapper<CKed> where CKed: CodingKeyed, CKe
     public func string(for key: CKed.Keys) -> String? {
         CKed.string(for: key, in: managed)
     }
+
     public func urn(for key: CKed.Keys) -> URN? {
         CKed.urn(for: key, in: managed)
     }
+
+    public func uuid(for key: CKed.Keys) -> UUID? {
+        CKed.uuid(for: key, in: managed)
+    }
+
+    public func data(for key: CKed.Keys) -> Data? {
+        CKed.data(for: key, in: managed)
+    }
+
     public func stringRepresentable<T>(for key: CKed.Keys) -> T? where T: ValueTypeRepresentable.StringRepresentable {
         CKed.stringRepresentable(for: key, in: managed)
     }
@@ -25,6 +35,14 @@ public struct CodingKeyedManagedObjectWrapper<CKed> where CKed: CodingKeyed, CKe
 
     public func value(for key: CKed.Keys) -> URN? {
         CKed.urn(for: key, in: managed)
+    }
+
+    public func value(for key: CKed.Keys) -> UUID? {
+        CKed.uuid(for: key, in: managed)
+    }
+
+    public func value(for key: CKed.Keys) -> Data? {
+        CKed.data(for: key, in: managed)
     }
 
     public func value(for key: CKed.Keys) -> String? {
@@ -38,6 +56,18 @@ public struct CodingKeyedManagedObjectWrapper<CKed> where CKed: CodingKeyed, CKe
     @discardableResult
     public func set(_ string: String, for key: CKed.Keys) -> Self {
         CKed.setString(string, for: key, in: managed)
+        return self
+    }
+
+    @discardableResult
+    public func set(_ uuid: UUID, for key: CKed.Keys) -> Self {
+        CKed.setUuid(uuid, for: key, in: managed)
+        return self
+    }
+
+    @discardableResult
+    public func set(_ data: Data, for key: CKed.Keys) -> Self {
+        CKed.setData(data, for: key, in: managed)
         return self
     }
 
@@ -87,6 +117,10 @@ public extension CodingKeyed where Self: CoreDataManaged {
 
     static func string(for key: Self.Keys, in managed: NSManagedObject) -> String? {
         return managed.value(forKeyPath: key.stringValue) as? String
+    }
+
+    static func uuid(for key: Self.Keys, in managed: NSManagedObject) -> UUID? {
+        return managed.value(forKeyPath: key.stringValue) as? UUID
     }
 
     static func urn(for key: Self.Keys, in managed: NSManagedObject) -> URN? {
@@ -161,6 +195,14 @@ public extension CodingKeyed where Self: CoreDataManaged {
 
     static func setUrn(_ urnValue: URN, for key: Self.Keys, in managed: NSManagedObject) {
         managed.setValue(urnValue.stringValue, forKey: key.stringValue)
+    }
+
+    static func setUuid(_ uuidValue: UUID, for key: Self.Keys, in managed: NSManagedObject) {
+        managed.setValue(uuidValue, forKey: key.stringValue)
+    }
+
+    static func setData(_ dataValue: Data, for key: Self.Keys, in managed: NSManagedObject) {
+        managed.setValue(dataValue, forKey: key.stringValue)
     }
 
     static func setStringRepresentable<T>(_ value: T, for key: Self.Keys, in managed: NSManagedObject) where T: ValueTypeRepresentable.StringRepresentable {
