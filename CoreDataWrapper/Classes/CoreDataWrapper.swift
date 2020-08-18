@@ -41,6 +41,17 @@ public class CoreDataWrapper {
                 }
             }
         }
+
+        func reset() throws {
+            let coordinator = container.persistentStoreCoordinator
+            for store in coordinator.persistentStores {
+                guard let url = store.url else {
+                    continue
+                }
+                try coordinator.remove(store)
+                try FileManager.default.removeItem(atPath: url.path)
+            }
+        }
     }
 
     public enum Context {
@@ -52,6 +63,11 @@ public class CoreDataWrapper {
 
     public init(containerName: String) {
         self.container = ContainerWrapper(containerName: containerName)
+    }
+
+    /// Nuclear option. Only use to debug.
+    public func reset() throws {
+        try container.reset()
     }
 
     @discardableResult
